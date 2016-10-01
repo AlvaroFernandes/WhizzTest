@@ -1,0 +1,134 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="content-type">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WHIZZ TECHNICAL TEST</title>
+    <link href="css/styles.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="page-container">
+      <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container">
+          <div class="navbar-header">
+           <button type="button" class="navbar-toggle" data-toggle="offcanvas" data-target=".sidebar-nav">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+           </button>
+           <a class="navbar-brand" href="#">Whizz technical test</a>
+    	    </div>
+        </div>
+      </div>
+      <div class="container">
+        <!-- side bar -->
+        <div class="row-offcanvas row-offcanvas-left">
+          <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+            <div class="well sidebar-nav">
+              <ul class="nav">
+                <li><a href="#" class="list-group-item" id="Cats">Cats</a></li>
+                <li><a href="#" class="list-group-item" id="Dogs">Dogs</a></li>
+                <li><a href="#" class="list-group-item" id="Flowers">Flowers</a></li>
+                <li><a href="#" class="list-group-item" id="Trees">Trees</a></li>
+                <li><a href="#" class="list-group-item" id="Trees">Trees</a></li>
+                <li><a href="#" class="list-group-item" id="Men">Men</a></li>
+                <li><a href="#" class="list-group-item" id="Women">Women</a></li>
+                <li><a href="#" class="list-group-item" id="Boys">Boys</a></li>
+                <li><a href="#" class="list-group-item" id="Girls">Girls</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!-- main area -->
+        <div class="col-xs-12 col-sm-9 main">
+          <p class="visible-xs">
+            <button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas"><i class="glyphicon glyphicon-chevron-left"></i></button>
+          </p>
+          <div class="jumbotron">
+            <h1 id="topTitle" class="text-center">Gallery Categories</h1>
+          </div>
+          <div class="row" id="gallery">
+              <div class="text-center">
+                <p>
+                  Select the category from the left to see images here.
+                </p>
+              </div>
+          </div>
+          <div class="row" id="desc">
+            <div class="modal-header">
+              <button type="button" class="close" >
+                <span class="glyphicon glyphicon-chevron-left"></span>
+              </button>
+              <h4 id="title_photo" class="modal-title text-center"></h4>
+            </div>
+            <div class="pull-left" id="photo">
+
+            </div>
+            <div class="pull-left" id="desc_photo">
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="node_modules/bootstrap/dist/bootstrap.min.js" type="text/javascript"></script>
+    <script src="node_modules/flickrapi/browser/flickrapi.js"></script>
+	  <script type="text/javascript">
+      $('.list-group-item').on("click",function(){
+        var searchterm =  $(this).attr("id");
+        $.getJSON("http://api.flickr.com/services/feeds/photos_public.gne?jsoncallback=?",
+        {
+          tags: searchterm,
+          tagmode: "any",
+          format: "json"
+        },
+              function(data) {
+          console.log(data);
+          $('#topTitle').text(searchterm+" photo gallery")
+          $('#gallery').empty();
+          $.each(data.items, function(i,item){
+            var url_photo = (item.media.m);
+            var link = (item.link);
+            $("<img/>").attr({src: url_photo, class: "portrait img-rounded", id: link}).prependTo("#gallery").wrap("<div class = 'col-sm-6 col-md-3'><a href = '#' class = 'thumbnail'></div>");
+            if ( i == 14 ) return false;
+          });
+          $("#gallery").on("click","img",function(){
+            var link = (event.target.id);
+            console.log(link);
+            var obj = data.items;
+            console.log(obj);
+            for(var i in obj){
+              if(obj[i].link == link){
+                var photo = (obj[i].media.m).replace("_m.jpg","_n.jpg");
+                var description = obj[i].description;
+                var name = obj[i].title;
+                console.log(photo);
+                $('#title_photo').text(name);
+                $("<img/>").attr({src: photo}).prependTo("#photo");
+                $("#desc_photo").html(description);
+              }
+            }
+
+
+          });
+        });
+      });
+      $(document).ready(function(){
+        $('[data-toggle=offcanvas]').click(function() {
+          $('.row-offcanvas').toggleClass('active');
+        });
+        $("#gallery,#desc").on("click","img,button",function(e){
+          e.preventDefault();
+          console.log( "clicked!" );
+          $("#gallery,#desc").toggle();
+        });
+        $("#desc").on("click","button",function(e){
+          e.preventDefault();
+          console.log( "clicked!" );
+          $('#photo').empty();
+        });
+      });
+      </script>
+  </body>
+</html>
